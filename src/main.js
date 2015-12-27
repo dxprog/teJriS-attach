@@ -6,6 +6,10 @@ const Dungeon = require('./game/dungeon');
 const LINK_DATA = require('./data/link.js');
 
 const FRAME_DELAY = parseInt(1000 / 60);
+const BUFFER_WIDTH = 256;
+const BUFFER_HEIGHT = 224;
+const SCREEN_WIDTH = BUFFER_WIDTH * 2;
+const SCREEN_HEIGHT = BUFFER_HEIGHT * 2;
 
 const KEY_CODES = {
   37: 'left',
@@ -26,7 +30,13 @@ var Game = function(window, canvasEl) {
   this._win = window;
   this._doc = window.document;
   this._canvasEl = canvasEl;
-  this._canvas = new Canvas(canvasEl);
+  this._ctx = canvasEl.getContext('2d');
+  this._ctx.imageSmoothingEnabled = false;
+
+  this._buffer = this._doc.createElement('canvas');
+  this._buffer.width = BUFFER_WIDTH;
+  this._buffer.height = BUFFER_HEIGHT;
+  this._canvas = new Canvas(this._buffer);
 
   this._gameObjects = {
     player: new Player(this),
@@ -45,6 +55,9 @@ Game.prototype = {
     this._gameObjects.player.update(KEY_STATE);
     this._gameObjects.dungeon.draw();
     this._gameObjects.player.draw();
+
+    this._ctx.drawImage(this._buffer, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT,
+      0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   },
 
   // Getters
