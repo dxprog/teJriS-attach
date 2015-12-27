@@ -1,6 +1,7 @@
 const Canvas = require('./graphics/canvas');
 const Sprite = require('./graphics/sprite');
 const Player = require('./game/player');
+const Dungeon = require('./game/dungeon');
 
 const LINK_DATA = require('./data/link.js');
 
@@ -27,7 +28,10 @@ var Game = function(window, canvasEl) {
     this._canvasEl = canvasEl;
     this._canvas = new Canvas(canvasEl);
     
-    this._link = new Player(this._win, this._canvas);
+    this._gameObjects = {
+        player: new Player(this),
+        dungeon: new Dungeon(require('./data/dungeon1'), this)
+    };
     
     this._doc.addEventListener('keydown', this._handleKeydown.bind(this));
     this._doc.addEventListener('keyup', this._handleKeyup.bind(this));
@@ -38,8 +42,20 @@ var Game = function(window, canvasEl) {
 Game.prototype = {
     loop() {
         this._canvas.clear();
-        this._link.update(KEY_STATE);
-        this._link.draw();
+        this._gameObjects.player.update(KEY_STATE);
+        this._gameObjects.dungeon.draw();
+        this._gameObjects.player.draw();
+    },
+    
+    // Getters
+    getWindow() {
+        return this._win;
+    },
+    getCanvas() {
+        return this._canvas;
+    },
+    getGameObject(name) {
+        return this._gameObjects[name];  
     },
     
     _handleKeydown(evt) {

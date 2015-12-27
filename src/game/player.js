@@ -4,8 +4,9 @@ const MOVE_SPEED = 1;
 const LINK_DATA = require('../data/link');
 const KEY_DELAY = LINK_DATA.defaultDuration;
 
-function Player(window, canvas) {
-    this._sprite = Sprite.loadSheet(LINK_DATA, window, canvas);
+function Player(game) {
+    this._game = game;
+    this._sprite = Sprite.loadSheet(LINK_DATA, game.getWindow(), game.getCanvas());
     this._x = 0;
     this._y = 0;
     this._directionCounter = 0;
@@ -20,20 +21,27 @@ Player.prototype = {
         this._animating = isKeyPressed;
         
         if (this._directionCounter <= 0 && isKeyPressed) {
+            var newX = this._x;
+            var newY = this._y;
+            var dungeon = this._game.getGameObject('dungeon');
+            
             if (keys.down) {
-                this._y += MOVE_SPEED;
+                newY += MOVE_SPEED;
                 this._sprite.setAnimation('down');
             } else if (keys.up) {
-                this._y -= MOVE_SPEED;
+                newY -= MOVE_SPEED;
                 this._sprite.setAnimation('up');
             } else if (keys.left) {
-                this._x -= MOVE_SPEED;
+                newX -= MOVE_SPEED;
                 this._sprite.setAnimation('left');
             } else if (keys.right) {
-                this._x += MOVE_SPEED;
+                newX += MOVE_SPEED;
                 this._sprite.setAnimation('right');
             }
-            this._sprite.move(this._x, this._y);
+            
+            if (dungeon.canPass(newX, newY + LINK_DATA.defaultHeight / 2, LINK_DATA.defaultWidth, LINK_DATA.defaultHeight / 2)) {
+                this._sprite.move(this._x, this._y);
+            }
         } else {
             this._directionCounter--;
         }
