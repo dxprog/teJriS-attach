@@ -25,21 +25,22 @@ Room.prototype = {
         var i = y;
         var data = this._data;
         var j, tileX, tileY;
-        var retVal = true;
+
         // TODO - make better
-        for (; i < height; i++) {
-            for (j = x; j < width; j++) {
+        for (; i < y + height; i++) {
+            for (j = x; j < x + width; j++) {
                 tileX = Math.floor(j / this._tileWidth);
                 tileY = Math.floor(i / this._tileHeight);
                 if (tileY >= 0 && data.length > tileY && tileX >= 0 && data[tileY].length > tileX) {
                     if (!data[tileY][tileX].passable) {
-                        retVal = false;
-                        break;
+                        return false;
                     }
+                } else {
+                    return false;
                 }
             }
         }
-        return retVal;
+        return true;
     }
 };
 

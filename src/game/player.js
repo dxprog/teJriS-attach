@@ -40,6 +40,8 @@ Player.prototype = {
             }
             
             if (dungeon.canPass(newX, newY + LINK_DATA.defaultHeight / 2, LINK_DATA.defaultWidth, LINK_DATA.defaultHeight / 2)) {
+                this._x = newX;
+                this._y = newY;
                 this._sprite.move(this._x, this._y);
             }
         } else {
