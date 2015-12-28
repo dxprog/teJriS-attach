@@ -1,6 +1,14 @@
 const Sprite = require('../graphics/sprite');
 const Room = require('./room');
 
+const TRANSITION_DURATION = 60;
+const TRANSITION_SPEEDS = {
+  east: { x: -1, y: 0 },
+  west: { x: 1, y: 0 },
+  north: { x: 0, y: 1 },
+  south: { x: 0, y: -1 }
+};
+
 function Dungeon(data, game) {
   this._data = data;
   this._loadTiles(game.getWindow(), game.getCanvas());
@@ -9,15 +17,17 @@ function Dungeon(data, game) {
 
 Dungeon.prototype = {
   _loadRooms() {
-    var rooms = this._rooms = [];
+    var self = this;
+    var rooms = this._rooms = {};
     var tileset = this._tileset;
     var tileWidth = this._data.tileWidth;
     var tileHeight = this._data.tileHeight;
-    this._data.rooms.forEach(function(roomName) {
+    Object.keys(self._data.rooms).forEach(function(roomName) {
       var data = require('../data/' + roomName);
-      rooms.push(new Room(data, tileWidth, tileHeight, tileset));
+      console.log(self._data.rooms);
+      rooms[roomName] = new Room(data, self._data.rooms[roomName].exits, tileWidth, tileHeight, tileset);
     });
-    this._currentRoom = rooms[this._data.startRoom];
+    this._currentRoom = rooms[self._data.startRoom];
   },
 
   _loadTiles(window, canvas) {
@@ -35,7 +45,34 @@ Dungeon.prototype = {
   },
 
   update() {
-
+    if (!this._transitioning) {
+      var transitionEdge = this._currentRoom.roomTransition();
+      if (transitionEdge) {
+        var nextRoom = this._currentRoom.getExitForDirection(transitionEdge);
+        if (nextRoom) {
+          var transitionSpeed = TRANSITION_SPEEDS[transitionEdge];
+          this._transitioning = true;
+          this._transitionCounter = 0;
+          this._nextRoom = this._rooms[nextRoom];
+          this._transitionX = 0;
+          this._transitionY = 0;
+          this._transitionSpeedX = this._currentRoom.getRoomWidthInPixels() / TRANSITION_DURATION;
+          this._transitionSpeedX *= transitionSpeed.x;
+          this._transitionSpeedY = this._currentRoom.getRoomHeightInPixels() / TRANSITION_DURATION;
+          this._transitionSpeedY *= transitionSpeed.y;
+        }
+      }
+    } else {
+      this._transitionX += this._transitionSpeedX;
+      this._transitionY += this._transitionSpeedY;
+      this._transitionCounter++;
+      if (this._transitionCounter >= TRANSITION_DURATION) {
+        this._currentRoom = this._nextRoom;
+        this._nextRoom = null;
+        this._transitioning = false;
+        this._transitionCounter = this._transitionX = this._transitionY = 0;
+      }
+    }
   },
 
   canPass(x, y, width, height) {
@@ -43,7 +80,14 @@ Dungeon.prototype = {
   },
 
   draw() {
-    this._currentRoom.draw();
+    this._currentRoom.draw(this._transitionX, this._transitionY);
+    if (this._nextRoom) {
+      this._nextRoom.draw(this._transitionX + 128, this._transitionY);
+    }
+  },
+
+  isTransitioning() {
+    return this._transitioning;
   }
 };
 

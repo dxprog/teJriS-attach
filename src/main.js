@@ -54,6 +54,7 @@ Game.prototype = {
   loop() {
     this._canvas.clear();
     this._gameObjects.player.update(KEY_STATE);
+    this._gameObjects.dungeon.update();
     this._gameObjects.dungeon.draw();
     this._gameObjects.player.draw();
 
