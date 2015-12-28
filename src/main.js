@@ -15,7 +15,8 @@ const KEY_CODES = {
   37: 'left',
   39: 'right',
   38: 'up',
-  40: 'down'
+  40: 'down',
+  65: 'action'
 };
 
 const KEY_STATE = {
