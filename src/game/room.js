@@ -81,6 +81,10 @@ Room.prototype = {
 
   getExitForDirection(direction) {
     return !!this._exits[direction] ? this._exits[direction] : false;
+  },
+
+  reset() {
+    delete this._edgeHit;
   }
 
 };
