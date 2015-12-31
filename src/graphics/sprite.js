@@ -3,6 +3,8 @@ const Texture = require('./texture');
 function Sprite(imagePath, window, canvas) {
   this._img = new Texture(imagePath, window, this._imageLoaded.bind(this));
   this._canvas = canvas;
+  this._canvasWidth = this._canvas.getWidth();
+  this._canvasHeight = this._canvas.getHeight();
   this._currentAnimation;
   this._animations = {};
   this._frame = 0;
@@ -42,6 +44,16 @@ Sprite.prototype = {
     if (this._drawable) {
       var currentAnimation = this._currentAnimation;
       var animation = this._animations[currentAnimation][this._frame];
+
+      // Verify that the sprite is within bounds of the canvas
+      if (
+        this.x + animation.width  <= 0 ||
+        this.y + animation.height <= 0 ||
+        this.x >= this._canvasWidth ||
+        this.y >= this._canvasWidth
+      ) {
+        return;
+      }
 
       this._canvas.drawWithZ(this._img, this.x, this.y, this.z, animation.width, animation.height, animation.x, animation.y);
       if (!pauseAnimation) {

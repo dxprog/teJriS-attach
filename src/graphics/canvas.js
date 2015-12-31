@@ -38,6 +38,14 @@ Canvas.prototype = {
   },
   clear() {
     this._ctx.clearRect(0, 0, this._el.width, this._el.height);
+  },
+
+  getWidth() {
+    return this._el.width;
+  },
+
+  getHeight() {
+    return this._el.height;
   }
 };
 
