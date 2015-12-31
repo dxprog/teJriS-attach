@@ -9,6 +9,7 @@ function Sprite(imagePath, window, canvas) {
   this._frameCounter = 0;
   this.x = 0;
   this.y = 0;
+  this.z = 0;
 }
 
 Sprite.prototype = {
@@ -33,12 +34,16 @@ Sprite.prototype = {
     }
   },
 
+  setZOrder(z) {
+    this.z = z;
+  },
+
   draw(pauseAnimation) {
     if (this._drawable) {
       var currentAnimation = this._currentAnimation;
       var animation = this._animations[currentAnimation][this._frame];
 
-      this._canvas.draw(this._img, this.x, this.y, animation.width, animation.height, animation.x, animation.y);
+      this._canvas.drawWithZ(this._img, this.x, this.y, this.z, animation.width, animation.height, animation.x, animation.y);
       if (!pauseAnimation) {
         this._frameCounter--;
         if (this._frameCounter === 0) {

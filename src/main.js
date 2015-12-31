@@ -53,10 +53,13 @@ var Game = function(window, canvasEl) {
 Game.prototype = {
   loop() {
     this._canvas.clear();
+
+    this._canvas.beginRender();
     this._gameObjects.player.update(KEY_STATE);
     this._gameObjects.dungeon.update();
     this._gameObjects.dungeon.draw();
     this._gameObjects.player.draw();
+    this._canvas.endRender();
 
     this._ctx.drawImage(this._buffer, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT,
       0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
