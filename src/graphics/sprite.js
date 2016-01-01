@@ -50,7 +50,7 @@ Sprite.prototype = {
         this.x + animation.width  <= 0 ||
         this.y + animation.height <= 0 ||
         this.x >= this._canvasWidth ||
-        this.y >= this._canvasWidth
+        this.y >= this._canvasHeight
       ) {
         return;
       }
