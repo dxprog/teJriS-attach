@@ -1,15 +1,30 @@
 const Sprite = require('../graphics/sprite');
 const Sword = require('./sword');
 
+// The speed at which Link moves in pixels
 const MOVE_SPEED = 1;
+
+// Link's sprite data
 const LINK_DATA = require('../data/link');
+
+// How long to delay key presses before allowing them to register again
 const KEY_DELAY = LINK_DATA.defaultDuration;
+
+// Directional constants
 const LEFT = 'left';
 const RIGHT = 'right';
 const DOWN = 'down';
 const UP = 'up';
+
+// Sword singing animation name prefix
 const SWINGING = 'sword-';
 
+/**
+ * Handles operations pertaining to the controllable player (aka Link)
+ *
+ * @constructor
+ * @param {Object~Game} game A reference to the game object
+ */
 function Player(game) {
   this._game = game;
   this._sprite = Sprite.loadSheet(LINK_DATA, game.getWindow(), game.getCanvas());
@@ -24,6 +39,13 @@ function Player(game) {
 }
 
 Player.prototype = {
+
+  /**
+   * Game-tick update
+   *
+   * @method update
+   * @param {Object} keys Current keyboard state
+   */
   update(keys) {
     var dungeon = this._game.getGameObject('dungeon');
     var isKeyPressed = Object.keys(keys).filter(function(key) {
@@ -50,6 +72,11 @@ Player.prototype = {
     }
   },
 
+  /**
+   * Draw's Link
+   *
+   * @method draw
+   */
   draw() {
     if (this._swinging) {
       this._sword.draw();
@@ -57,6 +84,14 @@ Player.prototype = {
     this._sprite.draw(!this._animating);
   },
 
+  /**
+   * Handles keyboard state for the player
+   *
+   * @method _handleKeyPress
+   * @private
+   * @param {Object} keys The keyboard state
+   * @param {Object~Dungeon} dungeon A reference to the current dungeon
+   */
   _handleKeyPress(keys, dungeon) {
     var newX = this._x;
     var newY = this._y;
@@ -84,6 +119,13 @@ Player.prototype = {
     }
   },
 
+  /**
+   * Updates the player as the dungeon transitions to a new screen
+   *
+   * @method _updateForDungeonTransition
+   * @private
+   * @param {Object~Dungeon} dungeon Reference to the dungeon
+   */
   _updateForDungeonTransition(dungeon) {
     var transitionSpeed = dungeon.getTransitionSpeeds();
     var currentRoomWidth = dungeon.getCurrentRoomWidth();

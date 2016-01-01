@@ -1,5 +1,13 @@
 const Texture = require('./texture');
 
+/**
+ * Handles complex sprites with multiple animations and frames
+ *
+ * @constructor
+ * @param {String} imagePath Path to the sprite's image file
+ * @param {window} window The window object
+ * @param {Object~Canvas} canvas The canvas object that will be drawn to
+ */
 function Sprite(imagePath, window, canvas) {
   this._img = new Texture(imagePath, window, this._imageLoaded.bind(this));
   this._canvas = canvas;
@@ -15,19 +23,47 @@ function Sprite(imagePath, window, canvas) {
 }
 
 Sprite.prototype = {
+
+  /**
+   * Whether the image has been successfully loaded
+   *
+   * @method _imageLoaded
+   * @private
+   * @return {Boolean}
+   */
   _imageLoaded() {
     this._drawable = true;
   },
 
+  /**
+   * Registers an animation to a name
+   *
+   * @method registerAnimation
+   * @param {String} name The name of the animation
+   * @param {Array} frames Animation frames data
+   */
   registerAnimation(name, frames) {
     this._animations[name] = Array.isArray(frames) ? frames : [ frames ];
   },
 
+  /**
+   * Moves the sprite
+   *
+   * @method move
+   * @param {Number} x X coordinate of the sprite
+   * @param {Number} y Y coordinate of the sprite
+   */
   move(x, y) {
     this.x = x;
     this.y = y;
   },
 
+  /**
+   * Sets the current animation
+   *
+   * @method setAnimation
+   * @param {String} name The name of the animation to play
+   */
   setAnimation(name) {
     if (name !== this._currentAnimation) {
       this._currentAnimation = name;
@@ -36,10 +72,22 @@ Sprite.prototype = {
     }
   },
 
+  /**
+   * Sets the Z order of the sprite
+   *
+   * @method setZOrder
+   * @param {Number} z The Z order
+   */
   setZOrder(z) {
     this.z = z;
   },
 
+  /**
+   * Draws the sprite to canvas and updates the animation (when applicable)
+   *
+   * @method draw
+   * @param {Boolean} pauseAnimation Whether to play the animation or not
+   */
   draw(pauseAnimation) {
     if (this._drawable) {
       var currentAnimation = this._currentAnimation;
@@ -71,6 +119,16 @@ Sprite.prototype = {
 
 };
 
+/**
+ * Loads sprite's image and multiple animations
+ *
+ * @method loadSheet
+ * @static
+ * @param {Object} data The sprite data
+ * @param {window} window A reference to the window
+ * @param {Object~Canvas} canvas The canvas that the sprite will draw to
+ * @return {Sprite} The created sprite object
+ */
 Sprite.loadSheet = function(data, window, canvas) {
   var out = new Sprite(data.imagePath, window, canvas);
   Object.keys(data.animations).forEach(function(name) {

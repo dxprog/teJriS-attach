@@ -1,7 +1,10 @@
 const Sprite = require('../graphics/sprite');
 const Room = require('./room');
 
+// Duration to transition to a new room
 const TRANSITION_DURATION = 60;
+
+// Speed map for transition of each direction
 const TRANSITION_SPEEDS = {
   east: { x: -1, y: 0 },
   west: { x: 1, y: 0 },
@@ -9,6 +12,13 @@ const TRANSITION_SPEEDS = {
   south: { x: 0, y: -1 }
 };
 
+/**
+ * Handles the state for a collection of rooms
+ *
+ * @constructor
+ * @param {Object} data The dungeon data
+ * @param {Object~Game} game A reference to the game object
+ */
 function Dungeon(data, game) {
   this._data = data;
   this._loadTiles(game.getWindow(), game.getCanvas());
@@ -16,6 +26,13 @@ function Dungeon(data, game) {
 }
 
 Dungeon.prototype = {
+
+  /**
+   * Loads and instantiates all the rooms for this dungeon
+   *
+   * @method _loadRooms
+   * @private
+   */
   _loadRooms() {
     var self = this;
     var rooms = this._rooms = {};
@@ -29,6 +46,14 @@ Dungeon.prototype = {
     this._currentRoom = rooms[self._data.startRoom];
   },
 
+  /**
+   * Loads the tileset for the dungeon
+   *
+   * @method _loadTiles
+   * @private
+   * @param {window} window A reference to the window
+   * @param {Object~Canvas} canvas A reference to the game canvas
+   */
   _loadTiles(window, canvas) {
     var data = this._data;
     var tileset = this._tileset = new Sprite('./images/' + data.tileset, window, canvas);
@@ -43,6 +68,11 @@ Dungeon.prototype = {
     });
   },
 
+  /**
+   * Game-tick update
+   *
+   * @method update
+   */
   update() {
     if (!this._transitioning) {
       var transitionEdge = this._currentRoom.roomTransition();
@@ -78,10 +108,25 @@ Dungeon.prototype = {
     }
   },
 
+  /**
+   * Whether the X/Y position is passable in the current room
+   *
+   * @method canPass
+   * @param {Number} x X position of the area to check
+   * @param {Number} y Y position of the area to check
+   * @param {Number} width Width of the area to check
+   * @param {Number} height Height of the area to check
+   * @return {Boolean} Whether the area is passable
+   */
   canPass(x, y, width, height) {
     return this._currentRoom.canPass(x, y, width, height);
   },
 
+  /**
+   * Draws the current visible areas of the dungeon
+   *
+   * @method draw
+   */
   draw() {
     this._currentRoom.draw(this._transitionX, this._transitionY);
     if (this._nextRoom) {
@@ -89,10 +134,22 @@ Dungeon.prototype = {
     }
   },
 
+  /**
+   * Whether we're currently transitioning to a new room
+   *
+   * @method isTransitioning
+   * @return {Boolean}
+   */
   isTransitioning() {
     return this._transitioning;
   },
 
+  /**
+   * Returns the current X/Y room transition speeds
+   *
+   * @method getTransitionSpeeds
+   * @return {Object} x/y speeds of the transition
+   */
   getTransitionSpeeds() {
     return {
       x: this._transitionSpeedX,
@@ -100,6 +157,12 @@ Dungeon.prototype = {
     };
   },
 
+  /**
+   * Returns the current room width in pixels
+   *
+   * @method getCurrentRoomWidth
+   * @return {Number}
+   */
   getCurrentRoomWidth() {
     return this._currentRoom.getRoomWidthInPixels();
   }

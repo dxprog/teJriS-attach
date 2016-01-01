@@ -3,14 +3,18 @@ const Sprite = require('./graphics/sprite');
 const Player = require('./game/player');
 const Dungeon = require('./game/dungeon');
 
-const LINK_DATA = require('./data/link.js');
-
+// The number of milliseconds between each frame
 const FRAME_DELAY = parseInt(1000 / 60);
+
+// The size of the off-screen buffer
 const BUFFER_WIDTH = 256;
 const BUFFER_HEIGHT = 224;
+
+// The size of the visible screen
 const SCREEN_WIDTH = BUFFER_WIDTH * 2;
 const SCREEN_HEIGHT = BUFFER_HEIGHT * 2;
 
+// Keycode mappings
 const KEY_CODES = {
   37: 'left',
   39: 'right',
@@ -19,6 +23,7 @@ const KEY_CODES = {
   65: 'action'
 };
 
+// Tracks the current keyboard state
 const KEY_STATE = {
   left: false,
   right: false,
@@ -27,7 +32,14 @@ const KEY_STATE = {
   action: false
 };
 
-var Game = function(window, canvasEl) {
+/**
+ * The game object
+ *
+ * @cosntructor
+ * @param {window} window A reference to the window
+ * @param {HTMLCanvasElement} canvasEl The canvas element to draw the game to
+ */
+function Game(window, canvasEl) {
   this._win = window;
   this._doc = window.document;
   this._canvasEl = canvasEl;
@@ -51,12 +63,16 @@ var Game = function(window, canvasEl) {
 };
 
 Game.prototype = {
+
+  /**
+   * The game loop
+   */
   loop() {
     this._canvas.clear();
 
     this._canvas.beginRender();
-    this._gameObjects.player.update(KEY_STATE);
     this._gameObjects.dungeon.update();
+    this._gameObjects.player.update(KEY_STATE);
     this._gameObjects.dungeon.draw();
     this._gameObjects.player.draw();
     this._canvas.endRender();
@@ -65,17 +81,44 @@ Game.prototype = {
       0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   },
 
-  // Getters
+  /**
+   * Returns the game's window reference
+   *
+   * @method getWindow
+   * @return {window}
+   */
   getWindow() {
     return this._win;
   },
+
+  /**
+   * Returns the game's canvas object
+   *
+   * @method getCanvas
+   * @return {Object~Canvas}
+   */
   getCanvas() {
     return this._canvas;
   },
+
+  /**
+   * Returns a named game object
+   *
+   * @method getGameObject
+   * @param {String} name The name of the object to fetch
+   * @return {Object}
+   */
   getGameObject(name) {
     return this._gameObjects[name];
   },
 
+  /**
+   * Key down event handler
+   *
+   * @method _handleKeydown
+   * @private
+   * @param {Object} evt The event object
+   */
   _handleKeydown(evt) {
     if (KEY_CODES.hasOwnProperty(evt.keyCode)) {
       KEY_STATE[KEY_CODES[evt.keyCode]] = true;
@@ -83,6 +126,13 @@ Game.prototype = {
     }
   },
 
+  /**
+   * Key up event handler
+   *
+   * @method _handleKeyup
+   * @private
+   * @param {Object} evt The event object
+   */
   _handleKeyup(evt) {
     if (KEY_CODES.hasOwnProperty(evt.keyCode)) {
       KEY_STATE[KEY_CODES[evt.keyCode]] = false;
