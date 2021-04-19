@@ -1,16 +1,15 @@
 {
-  "name": "jelda",
+  "name": "teJriS-attack",
   "version": "1.0.0",
-  "description": "A Zelda clone for competitive reasons",
-  "main": "index.html",
+  "description": "A coding comp in which I attempt to recreate Tetris Attack",
+  "main": "src/boot.js",
   "scripts": {
-    "start": "nw",
+    "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Matt Hackmann",
-  "license": "ISC",
-  "chromium-args": "--disable-threaded-compositing --disable-extensions --disable-plugins --disable-internal-flash --disable-popup-blocking --enable-gamepad --enable-html5-camera --allow-file-access-from-files --disable-software-rasterizer --ignore-gpu-blacklist",
-  "dependencies": {
-    "nw": "^0.12.3"
+  "license": "WTFPL",
+  "devDependencies": {
+    "electron": "^12.0.4"
   }
 }
