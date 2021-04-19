@@ -4,3 +4,4 @@
 credits.html
 *.pak
 node_modules
+dist/
