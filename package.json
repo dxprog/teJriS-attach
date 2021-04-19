@@ -1,7 +1,7 @@
 {
-  "name": "teJriS-attack",
+  "name": "jelda",
   "version": "1.0.0",
-  "description": "A coding comp in which I attempt to recreate Tetris Attack",
+  "description": "A Zelda clone for competitive reasons",
   "main": "src/boot.js",
   "scripts": {
     "start": "electron .",
