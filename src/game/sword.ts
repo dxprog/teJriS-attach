@@ -1,7 +1,9 @@
-var Sprite = require('../graphics/sprite');
+import Sprite from '../graphics/sprite';
 
 // Sprite data
-const SWORD_DATA = require('../data/sword');
+import * as SWORD_DATA from '../data/sword.json';
+import { StringDict } from '../interfaces/common';
+import { IPoint2d } from '../interfaces/sprites';
 
 // Speed at which the sword moves
 const SPEED = 2;
@@ -13,7 +15,7 @@ const EXTENSION_AMOUNT = 12 / SPEED;
 const DURATION = EXTENSION_AMOUNT * 2;
 
 // X/Y speeds for each direction
-const DIRECTION = {
+const DIRECTION: StringDict<IPoint2d> = {
   left: {
     x: -SPEED,
     y: 0
@@ -38,12 +40,19 @@ const DIRECTION = {
  * @constructor
  * @param {Object~Game} game Reference to the game object
  */
-function Sword(game) {
-  this._game = game;
-  this._sword = Sprite.loadSheet(SWORD_DATA, game.getWindow(), game.getCanvas());
-}
+class Sword {
+  private _game: any;
+  private _sword: Sprite;
+  private _counter: number;
+  private _animating: boolean;
+  private _x: number;
+  private _y: number;
+  private _velocity: IPoint2d;
 
-Sword.prototype = {
+  constructor(game: any) {
+    this._game = game;
+    this._sword = Sprite.loadSheet(SWORD_DATA, game.getWindow(), game.getCanvas());
+  }
 
   /**
    * Swings the sword
@@ -53,14 +62,14 @@ Sword.prototype = {
    * @param {Number} y Y position of the player
    * @param {String} direction The direction the player is facing
    */
-  swing(x, y, direction) {
+  swing(x: number, y: number, direction: string) {
     this._counter = 0;
     this._animating = true;
     this._x = x;
     this._y = y;
     this._velocity = DIRECTION[direction];
     this._sword.setAnimation(direction);
-  },
+  }
 
   /**
    * Game-tick sword updates
@@ -81,7 +90,7 @@ Sword.prototype = {
         this._animating = false;
       }
     }
-  },
+  }
 
   /**
    * Draws the sword
@@ -92,7 +101,7 @@ Sword.prototype = {
     if (this._animating) {
       this._sword.draw();
     }
-  },
+  }
 
   /**
    * Returns if the sword is swinging
@@ -105,4 +114,4 @@ Sword.prototype = {
   }
 };
 
-module.exports = Sword;
+export default Sword;

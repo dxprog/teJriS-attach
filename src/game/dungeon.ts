@@ -1,11 +1,20 @@
-const Sprite = require('../graphics/sprite');
-const Room = require('./room');
+import Sprite from '../graphics/sprite';
+import Room from './room';
+import { IPoint2d } from '../interfaces/sprites';
+import { StringDict } from '../interfaces/common';
+import Canvas from '../graphics/canvas';
+import { IDungeon, RoomMap } from '../interfaces/maps';
+
+import * as room1 from '../data/room1';
+import * as room2 from '../data/room2';
+
+const ROOMS: StringDict<RoomMap> = { room1, room2 }
 
 // Duration to transition to a new room
 const TRANSITION_DURATION = 60;
 
 // Speed map for transition of each direction
-const TRANSITION_SPEEDS = {
+const TRANSITION_SPEEDS: StringDict<IPoint2d> = {
   east: { x: -1, y: 0 },
   west: { x: 1, y: 0 },
   north: { x: 0, y: 1 },
@@ -19,13 +28,26 @@ const TRANSITION_SPEEDS = {
  * @param {Object} data The dungeon data
  * @param {Object~Game} game A reference to the game object
  */
-function Dungeon(data, game) {
-  this._data = data;
-  this._loadTiles(game.getWindow(), game.getCanvas());
-  this._loadRooms();
-}
+class Dungeon{
+  private _data: IDungeon;
+  private _rooms: StringDict<Room>;
+  private _tileset: Sprite;
+  private _currentRoom: Room;
+  private _nextRoom: Room;
+  private _transitioning: boolean;
+  private _transitionCounter: number;
+  private _transitionX: number;
+  private _transitionY: number;
+  private _transitionSpeedX: number;
+  private _transitionSpeedY: number;
+  private _nextRoomOffsetX: number;
+  private _nextRoomOffsetY: number;
 
-Dungeon.prototype = {
+  constructor(data: IDungeon, game: any) {
+    this._data = data;
+    this._loadTiles(game.getWindow(), game.getCanvas());
+    this._loadRooms();
+  }
 
   /**
    * Loads and instantiates all the rooms for this dungeon
@@ -35,16 +57,16 @@ Dungeon.prototype = {
    */
   _loadRooms() {
     var self = this;
-    var rooms = this._rooms = {};
+    var rooms: StringDict<Room> = {};
     var tileset = this._tileset;
     var tileWidth = this._data.tileWidth;
     var tileHeight = this._data.tileHeight;
     Object.keys(self._data.rooms).forEach(function(roomName) {
-      var data = require('../data/' + roomName);
-      rooms[roomName] = new Room(data, self._data.rooms[roomName].exits, tileWidth, tileHeight, tileset);
+      rooms[roomName] = new Room(ROOMS[roomName], self._data.rooms[roomName].exits, tileWidth, tileHeight, tileset);
     });
     this._currentRoom = rooms[self._data.startRoom];
-  },
+    this._rooms = rooms;
+  }
 
   /**
    * Loads the tileset for the dungeon
@@ -54,7 +76,7 @@ Dungeon.prototype = {
    * @param {window} window A reference to the window
    * @param {Object~Canvas} canvas A reference to the game canvas
    */
-  _loadTiles(window, canvas) {
+  _loadTiles(window: Window, canvas: Canvas) {
     var data = this._data;
     var tileset = this._tileset = new Sprite('./images/' + data.tileset, window, canvas);
     Object.keys(data.tiles).forEach(function(tileName) {
@@ -66,7 +88,7 @@ Dungeon.prototype = {
         y: tile.y * data.tileHeight
       }]);
     });
-  },
+  }
 
   /**
    * Game-tick update
@@ -76,7 +98,7 @@ Dungeon.prototype = {
   update() {
     if (!this._transitioning) {
       var transitionEdge = this._currentRoom.roomTransition();
-      if (transitionEdge) {
+      if (transitionEdge !== false && transitionEdge !== true) {
         var nextRoom = this._currentRoom.getExitForDirection(transitionEdge);
         if (nextRoom) {
           var transitionSpeed = TRANSITION_SPEEDS[transitionEdge];
@@ -106,7 +128,7 @@ Dungeon.prototype = {
         this._transitionCounter = this._transitionX = this._transitionY = 0;
       }
     }
-  },
+  }
 
   /**
    * Whether the X/Y position is passable in the current room
@@ -118,9 +140,9 @@ Dungeon.prototype = {
    * @param {Number} height Height of the area to check
    * @return {Boolean} Whether the area is passable
    */
-  canPass(x, y, width, height) {
+  canPass(x: number, y: number, width: number, height: number) {
     return this._currentRoom.canPass(x, y, width, height);
-  },
+  }
 
   /**
    * Draws the current visible areas of the dungeon
@@ -132,7 +154,7 @@ Dungeon.prototype = {
     if (this._nextRoom) {
       this._nextRoom.draw(this._transitionX + this._nextRoomOffsetX, this._transitionY + this._nextRoomOffsetY);
     }
-  },
+  }
 
   /**
    * Whether we're currently transitioning to a new room
@@ -142,7 +164,7 @@ Dungeon.prototype = {
    */
   isTransitioning() {
     return this._transitioning;
-  },
+  }
 
   /**
    * Returns the current X/Y room transition speeds
@@ -150,12 +172,12 @@ Dungeon.prototype = {
    * @method getTransitionSpeeds
    * @return {Object} x/y speeds of the transition
    */
-  getTransitionSpeeds() {
+  getTransitionSpeeds(): IPoint2d {
     return {
       x: this._transitionSpeedX,
       y: this._transitionSpeedY
     };
-  },
+  }
 
   /**
    * Returns the current room width in pixels
@@ -166,7 +188,6 @@ Dungeon.prototype = {
   getCurrentRoomWidth() {
     return this._currentRoom.getRoomWidthInPixels();
   }
-
 };
 
-module.exports = Dungeon;
+export default Dungeon;

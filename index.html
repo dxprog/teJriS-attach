@@ -2,11 +2,11 @@
 <html>
   <head>
     <title>Jelda - A Stupid Zelda Clone</title>
+    <script src="dist/game.js"></script>
   </head>
   <body>
     <canvas id="game" width="640" height="480"></canvas>
     <script>
-      var Game = require('./src/main');
       var game = new Game(window, document.getElementById('game'));
     </script>
   </body>

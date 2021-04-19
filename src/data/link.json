@@ -1,4 +1,4 @@
-module.exports = {
+{
   "imagePath": "images/link.png",
   "defaultDuration": 5,
   "defaultWidth": 16,
@@ -70,4 +70,4 @@ module.exports = {
       }
     ]
   }
-};
+}

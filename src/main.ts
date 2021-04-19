@@ -1,10 +1,10 @@
-const Canvas = require('./graphics/canvas');
-const Sprite = require('./graphics/sprite');
-const Player = require('./game/player');
-const Dungeon = require('./game/dungeon');
+import { NumDict, StringDict } from './interfaces/common';
+import Canvas from './graphics/canvas';
+import Player from './game/player';
+import Dungeon from './game/dungeon';
 
 // The number of milliseconds between each frame
-const FRAME_DELAY = parseInt(1000 / 60);
+const FRAME_DELAY: number = Math.floor(1000 / 60);
 
 // The size of the off-screen buffer
 const BUFFER_WIDTH = 256;
@@ -15,7 +15,7 @@ const SCREEN_WIDTH = BUFFER_WIDTH * 2;
 const SCREEN_HEIGHT = BUFFER_HEIGHT * 2;
 
 // Keycode mappings
-const KEY_CODES = {
+const KEY_CODES: NumDict<string> = {
   37: 'left',
   39: 'right',
   38: 'up',
@@ -24,7 +24,7 @@ const KEY_CODES = {
 };
 
 // Tracks the current keyboard state
-const KEY_STATE = {
+const KEY_STATE: StringDict<boolean> = {
   left: false,
   right: false,
   up: false,
@@ -39,30 +39,37 @@ const KEY_STATE = {
  * @param {window} window A reference to the window
  * @param {HTMLCanvasElement} canvasEl The canvas element to draw the game to
  */
-function Game(window, canvasEl) {
-  this._win = window;
-  this._doc = window.document;
-  this._canvasEl = canvasEl;
-  this._ctx = canvasEl.getContext('2d');
-  this._ctx.imageSmoothingEnabled = false;
+class Game {
+  private _win: Window;
+  private _doc: Document;
+  private _canvasEl: HTMLCanvasElement;
+  private _ctx: CanvasRenderingContext2D;
+  private _buffer: HTMLCanvasElement;
+  private _canvas: Canvas;
+  private _gameObjects: StringDict<any>;
 
-  this._buffer = this._doc.createElement('canvas');
-  this._buffer.width = BUFFER_WIDTH;
-  this._buffer.height = BUFFER_HEIGHT;
-  this._canvas = new Canvas(this._buffer);
+  constructor(window: Window, canvasEl: HTMLCanvasElement) {
+    this._win = window;
+    this._doc = window.document;
+    this._canvasEl = canvasEl;
+    this._ctx = canvasEl.getContext('2d');
+    this._ctx.imageSmoothingEnabled = false;
 
-  this._gameObjects = {
-    player: new Player(this),
-    dungeon: new Dungeon(require('./data/dungeon1'), this)
-  };
+    this._buffer = this._doc.createElement('canvas');
+    this._buffer.width = BUFFER_WIDTH;
+    this._buffer.height = BUFFER_HEIGHT;
+    this._canvas = new Canvas(this._buffer);
 
-  this._doc.addEventListener('keydown', this._handleKeydown.bind(this));
-  this._doc.addEventListener('keyup', this._handleKeyup.bind(this));
+    this._gameObjects = {
+      player: new Player(this),
+      dungeon: new Dungeon(require('./data/dungeon1'), this)
+    };
 
-  setInterval(this.loop.bind(this), FRAME_DELAY);
-};
+    this._doc.addEventListener('keydown', this._handleKeydown.bind(this));
+    this._doc.addEventListener('keyup', this._handleKeyup.bind(this));
 
-Game.prototype = {
+    setInterval(this.loop.bind(this), FRAME_DELAY);
+  }
 
   /**
    * The game loop
@@ -79,7 +86,7 @@ Game.prototype = {
 
     this._ctx.drawImage(this._buffer, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT,
       0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  },
+  }
 
   /**
    * Returns the game's window reference
@@ -89,7 +96,7 @@ Game.prototype = {
    */
   getWindow() {
     return this._win;
-  },
+  }
 
   /**
    * Returns the game's canvas object
@@ -99,7 +106,7 @@ Game.prototype = {
    */
   getCanvas() {
     return this._canvas;
-  },
+  }
 
   /**
    * Returns a named game object
@@ -108,9 +115,9 @@ Game.prototype = {
    * @param {String} name The name of the object to fetch
    * @return {Object}
    */
-  getGameObject(name) {
+  getGameObject(name: any) {
     return this._gameObjects[name];
-  },
+  }
 
   /**
    * Key down event handler
@@ -119,12 +126,12 @@ Game.prototype = {
    * @private
    * @param {Object} evt The event object
    */
-  _handleKeydown(evt) {
+  _handleKeydown(evt: KeyboardEvent) {
     if (KEY_CODES.hasOwnProperty(evt.keyCode)) {
       KEY_STATE[KEY_CODES[evt.keyCode]] = true;
       evt.preventDefault();
     }
-  },
+  }
 
   /**
    * Key up event handler
@@ -133,12 +140,12 @@ Game.prototype = {
    * @private
    * @param {Object} evt The event object
    */
-  _handleKeyup(evt) {
+  _handleKeyup(evt: KeyboardEvent) {
     if (KEY_CODES.hasOwnProperty(evt.keyCode)) {
       KEY_STATE[KEY_CODES[evt.keyCode]] = false;
       evt.preventDefault();
     }
   }
-};
+}
 
-module.exports = Game;
+(window as any).Game = Game;

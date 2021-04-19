@@ -1,4 +1,7 @@
-const Texture = require('./texture');
+import { StringDict } from '../interfaces/common';
+import { ISpriteSheet } from '../interfaces/sprites';
+import Texture from './texture';
+import Canvas from './canvas';
 
 /**
  * Handles complex sprites with multiple animations and frames
@@ -8,21 +11,63 @@ const Texture = require('./texture');
  * @param {window} window The window object
  * @param {Object~Canvas} canvas The canvas object that will be drawn to
  */
-function Sprite(imagePath, window, canvas) {
-  this._img = new Texture(imagePath, window, this._imageLoaded.bind(this));
-  this._canvas = canvas;
-  this._canvasWidth = this._canvas.getWidth();
-  this._canvasHeight = this._canvas.getHeight();
-  this._currentAnimation;
-  this._animations = {};
-  this._frame = 0;
-  this._frameCounter = 0;
-  this.x = 0;
-  this.y = 0;
-  this.z = 0;
-}
+class Sprite {
+  private _img: Texture;
+  private _canvas: Canvas;
+  private _canvasWidth: number;
+  private _canvasHeight: number;
+  private _currentAnimation: string;
+  private _animations: StringDict<any>;
+  private _frame: number;
+  private _frameCounter: number;
+  private _drawable: boolean;
+  public x: number;
+  public y: number;
+  public z: number;
 
-Sprite.prototype = {
+  /**
+   * Loads sprite's image and multiple animations
+   *
+   * @method loadSheet
+   * @static
+   * @param {Object} data The sprite data
+   * @param {window} window A reference to the window
+   * @param {Object~Canvas} canvas The canvas that the sprite will draw to
+   * @return {Sprite} The created sprite object
+   */
+  static loadSheet (data: ISpriteSheet, window: Window, canvas: Canvas): Sprite {
+    var out = new Sprite(data.imagePath, window, canvas);
+    Object.keys(data.animations).forEach(function(name) {
+      var animation = data.animations[name];
+      animation.forEach(function(frame: any) {
+        frame.width = frame.width || data.defaultWidth;
+        frame.height = frame.height || data.defaultHeight;
+        frame.duration = frame.duration || data.defaultDuration;
+      });
+      out.registerAnimation(name, animation);
+    });
+
+    if (data.defaultAnimation) {
+      out.setAnimation(data.defaultAnimation);
+    }
+
+    return out;
+  }
+
+  constructor(imagePath: string, window: Window, canvas: Canvas) {
+    this._img = new Texture(imagePath, window, this._imageLoaded.bind(this));
+    this._drawable = false;
+    this._canvas = canvas;
+    this._canvasWidth = this._canvas.getWidth();
+    this._canvasHeight = this._canvas.getHeight();
+    this._currentAnimation;
+    this._animations = {};
+    this._frame = 0;
+    this._frameCounter = 0;
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+  }
 
   /**
    * Whether the image has been successfully loaded
@@ -33,7 +78,7 @@ Sprite.prototype = {
    */
   _imageLoaded() {
     this._drawable = true;
-  },
+  }
 
   /**
    * Registers an animation to a name
@@ -42,9 +87,9 @@ Sprite.prototype = {
    * @param {String} name The name of the animation
    * @param {Array} frames Animation frames data
    */
-  registerAnimation(name, frames) {
+  registerAnimation(name: string, frames: Array<any>) {
     this._animations[name] = Array.isArray(frames) ? frames : [ frames ];
-  },
+  }
 
   /**
    * Moves the sprite
@@ -53,10 +98,10 @@ Sprite.prototype = {
    * @param {Number} x X coordinate of the sprite
    * @param {Number} y Y coordinate of the sprite
    */
-  move(x, y) {
+  move(x: number, y: number) {
     this.x = x;
     this.y = y;
-  },
+  }
 
   /**
    * Sets the current animation
@@ -64,13 +109,13 @@ Sprite.prototype = {
    * @method setAnimation
    * @param {String} name The name of the animation to play
    */
-  setAnimation(name) {
+  setAnimation(name: string) {
     if (name !== this._currentAnimation) {
       this._currentAnimation = name;
       this._frame = 0;
       this._frameCounter = this._animations[name][0].duration || -1;
     }
-  },
+  }
 
   /**
    * Sets the Z order of the sprite
@@ -78,9 +123,9 @@ Sprite.prototype = {
    * @method setZOrder
    * @param {Number} z The Z order
    */
-  setZOrder(z) {
+  setZOrder(z: number) {
     this.z = z;
-  },
+  }
 
   /**
    * Draws the sprite to canvas and updates the animation (when applicable)
@@ -88,7 +133,7 @@ Sprite.prototype = {
    * @method draw
    * @param {Boolean} pauseAnimation Whether to play the animation or not
    */
-  draw(pauseAnimation) {
+  draw(pauseAnimation: boolean = false) {
     if (this._drawable) {
       var currentAnimation = this._currentAnimation;
       var animation = this._animations[currentAnimation][this._frame];
@@ -119,33 +164,4 @@ Sprite.prototype = {
 
 };
 
-/**
- * Loads sprite's image and multiple animations
- *
- * @method loadSheet
- * @static
- * @param {Object} data The sprite data
- * @param {window} window A reference to the window
- * @param {Object~Canvas} canvas The canvas that the sprite will draw to
- * @return {Sprite} The created sprite object
- */
-Sprite.loadSheet = function(data, window, canvas) {
-  var out = new Sprite(data.imagePath, window, canvas);
-  Object.keys(data.animations).forEach(function(name) {
-    var animation = data.animations[name];
-    animation.forEach(function(frame) {
-      frame.width = frame.width || data.defaultWidth;
-      frame.height = frame.height || data.defaultHeight;
-      frame.duration = frame.duration || data.defaultDuration;
-    });
-    out.registerAnimation(name, animation);
-  });
-
-  if (data.defaultAnimation) {
-    out.setAnimation(data.defaultAnimation);
-  }
-
-  return out;
-};
-
-module.exports = Sprite;
+export default Sprite;
