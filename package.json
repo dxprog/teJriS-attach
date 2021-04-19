@@ -5,11 +5,17 @@
   "main": "src/boot.js",
   "scripts": {
     "start": "electron .",
+    "build:dev": "webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Matt Hackmann",
   "license": "WTFPL",
   "devDependencies": {
-    "electron": "^12.0.4"
+    "@tsconfig/node14": "^1.0.0",
+    "electron": "^12.0.4",
+    "ts-loader": "^9.0.0",
+    "typescript": "^4.2.4",
+    "webpack": "^5.33.2",
+    "webpack-cli": "^4.6.0"
   }
 }
