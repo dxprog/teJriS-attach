@@ -1,0 +1,45 @@
+{
+  "imagePath": "images/panels.png",
+  "defaultDuration": 3,
+  "defaultWidth": 64,
+  "defaultHeight": 64,
+  "defaultAnimation": "heart",
+  "animations": {
+    "heart": [
+      {
+        "x": 0,
+        "y": 0
+      }
+    ],
+    "diamond": [
+      {
+        "x": 64,
+        "y": 0
+      }
+    ],
+    "star": [
+      {
+        "x": 128,
+        "y": 0
+      }
+    ],
+    "circle": [
+      {
+        "x": 192,
+        "y": 0
+      }
+    ],
+    "triangle": [
+      {
+        "x": 256,
+        "y": 0
+      }
+    ],
+    "dark-triangle": [
+      {
+        "x": 320,
+        "y": 0
+      }
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 import { NumDict, StringDict } from '../interfaces/common';
-import { GameObject } from '../interfaces/game';
+import { IGameObject } from '../interfaces/game';
 import Canvas from '../graphics/canvas';
 
 // The number of milliseconds between each frame
@@ -44,7 +44,7 @@ class Game {
   private _ctx: CanvasRenderingContext2D;
   private _buffer: HTMLCanvasElement;
   private _canvas: Canvas;
-  private _gameObjects: StringDict<GameObject>;
+  private _gameObjects: StringDict<IGameObject>;
 
   constructor(window: Window, canvasEl: HTMLCanvasElement) {
     this._win = window;
@@ -56,6 +56,7 @@ class Game {
     this._buffer.width = BUFFER_WIDTH;
     this._buffer.height = BUFFER_HEIGHT;
     this._canvas = new Canvas(this._buffer);
+    this._gameObjects = {};
 
     this._doc.addEventListener('keydown', this._handleKeydown.bind(this));
     this._doc.addEventListener('keyup', this._handleKeyup.bind(this));
@@ -63,7 +64,7 @@ class Game {
     setInterval(this.loop.bind(this), FRAME_DELAY);
   }
 
-  addGameObject(name: string, obj: GameObject) {
+  addGameObject(name: string, obj: IGameObject) {
     this._gameObjects[name] = obj;
   }
 
@@ -78,6 +79,13 @@ class Game {
     this._canvas.clear();
 
     this._canvas.beginRender();
+
+    // this is gonna be slow; address it somewhere
+    const gameObjects = Object.values(this._gameObjects);
+    gameObjects.forEach(gameObject => {
+      gameObject.update(0);
+      gameObject.draw();
+    });
 
     this._canvas.endRender();
 
