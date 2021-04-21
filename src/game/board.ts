@@ -7,10 +7,23 @@ import * as PANEL_SPRITE from '../data/panels.json';
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
 const BOARD_AREA = BOARD_WIDTH * BOARD_HEIGHT;
+const NUM_PANEL_TYPES = 5;
+
+const PANEL_WIDTH = 32;
+const PANEL_HEIGHT = 32;
+
+const PANEL_TYPES = [
+  'heart',
+  'diamond',
+  'star',
+  'circle',
+  'triangle',
+  'dark-triangle'
+];
 
 class Board implements IGameObject {
   private _game: Game;
-  private _board: Array<any>;
+  private _board: Array<Sprite>;
 
   constructor(game: Game) {
     this._game = game;
@@ -50,16 +63,40 @@ class Board implements IGameObject {
       }
     }
 
-    let boardString = '';
-    for (let y = 0; y < BOARD_HEIGHT; y++) {
-      for (let x = 0; x < BOARD_WIDTH; x++) {
-        const index = y * BOARD_WIDTH + x;
-        boardString += board[index] ? 'X' : ' ';
+    // give the blocks types such that no block can touch one
+    // of the same type
+    const panelTypes: Array<number> = [];
+    board.forEach((hasTile, index) => {
+      if (hasTile) {
+        let type = Math.floor(Math.random() * NUM_PANEL_TYPES);
+        let previousPanel = index - 1;
+        let abovePanel = index - BOARD_WIDTH;
+        while (
+          (previousPanel > -1 && panelTypes[previousPanel] === type) ||
+          (abovePanel > -1 && panelTypes[abovePanel] === type)
+        ) {
+          type = Math.floor(Math.random() * NUM_PANEL_TYPES);
+        }
+        panelTypes.push(type);
+      } else {
+        panelTypes.push(null);
       }
-      boardString += '\n';
-    }
+    });
 
-    console.log(boardString);
+    const win = this._game.getWindow();
+    const canvas = this._game.getCanvas();
+    this._board = panelTypes.map((type, index) => {
+      if (type !== null) {
+        const panel = Sprite.loadSheet(PANEL_SPRITE, win, canvas);
+        const y = Math.floor(index / BOARD_WIDTH);
+        const x = index % BOARD_WIDTH;
+        panel.move(x * PANEL_WIDTH, y * PANEL_HEIGHT);
+        panel.setAnimation(PANEL_TYPES[type]);
+        return panel;
+      }
+
+      return null;
+    });
   }
 
   update(td: number) {
@@ -67,7 +104,11 @@ class Board implements IGameObject {
   }
 
   draw() {
-
+    this._board.forEach(panel => {
+      if (panel) {
+        panel.draw();
+      }
+    });
   }
 }
 

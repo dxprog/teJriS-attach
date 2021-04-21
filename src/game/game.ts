@@ -6,12 +6,12 @@ import Canvas from '../graphics/canvas';
 const FRAME_DELAY: number = Math.floor(1000 / 60);
 
 // The size of the off-screen buffer
-const BUFFER_WIDTH = 256;
-const BUFFER_HEIGHT = 224;
+const BUFFER_WIDTH = 640;
+const BUFFER_HEIGHT = 480;
 
 // The size of the visible screen
-const SCREEN_WIDTH = BUFFER_WIDTH * 2;
-const SCREEN_HEIGHT = BUFFER_HEIGHT * 2;
+const SCREEN_WIDTH = BUFFER_WIDTH;
+const SCREEN_HEIGHT = BUFFER_HEIGHT;
 
 // Keycode mappings
 const KEY_CODES: NumDict<string> = {

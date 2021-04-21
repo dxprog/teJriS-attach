@@ -35,7 +35,7 @@ class Sprite {
    * @param {Object~Canvas} canvas The canvas that the sprite will draw to
    * @return {Sprite} The created sprite object
    */
-  static loadSheet (data: ISpriteSheet, window: Window, canvas: Canvas): Sprite {
+  static loadSheet(data: ISpriteSheet, window: Window, canvas: Canvas): Sprite {
     var out = new Sprite(data.imagePath, window, canvas);
     Object.keys(data.animations).forEach(function(name) {
       var animation = data.animations[name];
@@ -149,7 +149,7 @@ class Sprite {
       }
 
       this._canvas.drawWithZ(this._img, this.x, this.y, this.z, animation.width, animation.height, animation.x, animation.y);
-      if (!pauseAnimation) {
+      if (!pauseAnimation && this._animations[currentAnimation].length) {
         this._frameCounter--;
         if (this._frameCounter === 0) {
           this._frame++;
