@@ -54,19 +54,40 @@ class Sprite {
     return out;
   }
 
-  constructor(imagePath: string, window: Window, canvas: Canvas) {
-    this._img = new Texture(imagePath, window, this._imageLoaded.bind(this));
-    this._drawable = false;
-    this._canvas = canvas;
-    this._canvasWidth = this._canvas.getWidth();
-    this._canvasHeight = this._canvas.getHeight();
-    this._currentAnimation;
-    this._animations = {};
-    this._frame = 0;
-    this._frameCounter = 0;
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
+  constructor(imagePathOrSprite: string | Sprite, window?: Window, canvas?: Canvas) {
+    if (
+      typeof imagePathOrSprite === 'string' &&
+      window &&
+      canvas
+    ) {
+      this._img = new Texture(imagePathOrSprite, window, this._imageLoaded.bind(this));
+      this._drawable = false;
+      this._canvas = canvas;
+      this._canvasWidth = this._canvas.getWidth();
+      this._canvasHeight = this._canvas.getHeight();
+      this._currentAnimation;
+      this._animations = {};
+      this._frame = 0;
+      this._frameCounter = 0;
+      this.x = 0;
+      this.y = 0;
+      this.z = 0;
+    } else if (imagePathOrSprite instanceof Sprite) {
+      this._img = imagePathOrSprite._img;
+      this._drawable = true;
+      this._canvas = imagePathOrSprite._canvas;
+      this._canvasWidth = imagePathOrSprite._canvasWidth;
+      this._canvasHeight = imagePathOrSprite._canvasHeight;
+      this._currentAnimation = imagePathOrSprite._currentAnimation;
+      this._animations = imagePathOrSprite._animations;
+      this._frame = imagePathOrSprite._frame;
+      this._frameCounter = imagePathOrSprite._frameCounter;
+      this.x = imagePathOrSprite.x;
+      this.y = imagePathOrSprite.y;
+      this.z = imagePathOrSprite.z;
+    } else {
+      throw 'How did you try and create a sprite with bad args?';
+    }
   }
 
   /**

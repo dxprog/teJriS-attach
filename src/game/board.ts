@@ -3,30 +3,25 @@ import { IGameObject } from '../interfaces/game';
 import Game from './game';
 
 import * as PANEL_SPRITE from '../data/panels.json';
+import Panel from './panel';
 
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
 const BOARD_AREA = BOARD_WIDTH * BOARD_HEIGHT;
 const NUM_PANEL_TYPES = 5;
 
-const PANEL_WIDTH = 32;
-const PANEL_HEIGHT = 32;
-
-const PANEL_TYPES = [
-  'heart',
-  'diamond',
-  'star',
-  'circle',
-  'triangle',
-  'dark-triangle'
-];
-
 class Board implements IGameObject {
   private _game: Game;
-  private _board: Array<Sprite>;
+  private _board: Array<Panel>;
+  private _basePanelSprite: Sprite;
 
   constructor(game: Game) {
     this._game = game;
+    this._basePanelSprite = Sprite.loadSheet(
+      PANEL_SPRITE,
+      game.getWindow(),
+      game.getCanvas()
+    );
     this.resetBoard();
   }
 
@@ -83,16 +78,11 @@ class Board implements IGameObject {
       }
     });
 
-    const win = this._game.getWindow();
-    const canvas = this._game.getCanvas();
     this._board = panelTypes.map((type, index) => {
       if (type !== null) {
-        const panel = Sprite.loadSheet(PANEL_SPRITE, win, canvas);
         const y = Math.floor(index / BOARD_WIDTH);
         const x = index % BOARD_WIDTH;
-        panel.move(x * PANEL_WIDTH, y * PANEL_HEIGHT);
-        panel.setAnimation(PANEL_TYPES[type]);
-        return panel;
+        return new Panel(x, y, type, this._basePanelSprite);
       }
 
       return null;
