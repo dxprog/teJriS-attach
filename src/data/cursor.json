@@ -1,0 +1,19 @@
+{
+  "imagePath": "images/cursor.png",
+  "defaultDuration": 20,
+  "defaultWidth": 76,
+  "defaultHeight": 44,
+  "defaultAnimation": "default",
+  "animations": {
+    "default": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 0,
+        "y": 44
+      }
+    ]
+  }
+}

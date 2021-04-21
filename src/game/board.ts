@@ -11,12 +11,10 @@ const BOARD_AREA = BOARD_WIDTH * BOARD_HEIGHT;
 const NUM_PANEL_TYPES = 5;
 
 class Board implements IGameObject {
-  private _game: Game;
   private _board: Array<Panel>;
   private _basePanelSprite: Sprite;
 
   constructor(game: Game) {
-    this._game = game;
     this._basePanelSprite = Sprite.loadSheet(
       PANEL_SPRITE,
       game.getWindow(),
