@@ -19,7 +19,7 @@ const KEY_CODES: NumDict<string> = {
   39: 'right',
   38: 'up',
   40: 'down',
-  65: 'action'
+  32: 'swap'
 };
 
 // Tracks the current keyboard state
@@ -45,6 +45,7 @@ class Game {
   private _buffer: HTMLCanvasElement;
   private _canvas: Canvas;
   private _gameObjects: StringDict<IGameObject>;
+  private _lastUpdate: number;
 
   constructor(window: Window, canvasEl: HTMLCanvasElement) {
     this._win = window;
@@ -57,6 +58,7 @@ class Game {
     this._buffer.height = BUFFER_HEIGHT;
     this._canvas = new Canvas(this._buffer);
     this._gameObjects = {};
+    this._lastUpdate = Date.now();
 
     this._doc.addEventListener('keydown', this._handleKeydown.bind(this));
     this._doc.addEventListener('keyup', this._handleKeyup.bind(this));
@@ -76,6 +78,9 @@ class Game {
    * The game loop
    */
   loop() {
+    const updateTime = Date.now();
+    const diff = updateTime - this._lastUpdate;
+
     this._canvas.clear();
 
     this._canvas.beginRender();
@@ -83,7 +88,7 @@ class Game {
     // this is gonna be slow; address it somewhere
     const gameObjects = Object.values(this._gameObjects);
     gameObjects.forEach(gameObject => {
-      gameObject.update(0);
+      gameObject.update(diff);
       gameObject.draw();
     });
 
@@ -91,6 +96,8 @@ class Game {
 
     this._ctx.drawImage(this._buffer, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT,
       0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    this._lastUpdate = updateTime;
   }
 
   getInputState() {

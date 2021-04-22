@@ -6,6 +6,7 @@ import * as PANEL_SPRITE from '../data/panels.json';
 import Panel from './panel';
 import Cursor, { Direction } from './cursor';
 import { StringDict } from '../interfaces/common';
+import PanelStateSwap, { SwapDirection } from './PanelStateSwap';
 
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
@@ -105,7 +106,7 @@ class Board implements IGameObject {
     });
   }
 
-  update(td: number) {
+  private _updateKeyboard(delta: number) {
     // keyboard checks
     const keyState = this._game.getInputState();
 
@@ -138,9 +139,32 @@ class Board implements IGameObject {
       this._cursor.move(Direction.Down);
     }
 
+    if (keyState.swap && !this._inputBuffer.swap) {
+      const index = this._cursor.y * BOARD_WIDTH + this._cursor.x;
+      if (this._board[index]) {
+        this._board[index].setStateModifier(PanelStateSwap(SwapDirection.Right));
+      }
+      if (this._board[index + 1]) {
+        this._board[index + 1].setStateModifier(PanelStateSwap(SwapDirection.Left));
+      }
+    }
+
     // duplicate the current keyboard state so we
     // can act on a change in state later
     this._inputBuffer = { ...keyState };
+  }
+
+  private _updatePanels(delta: number) {
+    this._board.forEach(panel => {
+      if (panel) {
+        panel.update(delta);
+      }
+    });
+  }
+
+  update(delta: number) {
+    this._updateKeyboard(delta);
+    this._updatePanels(delta);
   }
 
   draw() {
