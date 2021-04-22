@@ -1,9 +1,8 @@
 import { IGameObject } from '../interfaces/game';
 import Sprite from '../graphics/sprite';
-import Game from './game';
 
-const PANEL_WIDTH = 32;
-const PANEL_HEIGHT = 32;
+export const PANEL_WIDTH = 32;
+export const PANEL_HEIGHT = 32;
 
 const PANEL_TYPES = [
   'heart',

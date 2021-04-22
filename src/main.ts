@@ -11,6 +11,5 @@ document.addEventListener('DOMContentLoaded', () => {
   const board = new Board(game);
   const cursor = new Cursor(game);
   game.addGameObject('board', board);
-  game.addGameObject('cursor', cursor);
 
 });

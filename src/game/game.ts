@@ -93,6 +93,10 @@ class Game {
       0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   }
 
+  getInputState() {
+    return KEY_STATE;
+  }
+
   /**
    * Returns the game's window reference
    *

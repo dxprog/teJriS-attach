@@ -4,6 +4,8 @@ import Game from './game';
 
 import * as PANEL_SPRITE from '../data/panels.json';
 import Panel from './panel';
+import Cursor, { Direction } from './cursor';
+import { StringDict } from '../interfaces/common';
 
 const BOARD_WIDTH = 6;
 const BOARD_HEIGHT = 12;
@@ -11,16 +13,32 @@ const BOARD_AREA = BOARD_WIDTH * BOARD_HEIGHT;
 const NUM_PANEL_TYPES = 5;
 
 class Board implements IGameObject {
+  private _game: Game;
   private _board: Array<Panel>;
   private _basePanelSprite: Sprite;
+  private _cursor: Cursor;
+  private _inputBuffer: StringDict<boolean>;
 
   constructor(game: Game) {
+    this._game = game;
     this._basePanelSprite = Sprite.loadSheet(
       PANEL_SPRITE,
       game.getWindow(),
       game.getCanvas()
     );
     this.resetBoard();
+    this._cursor = new Cursor(game);
+    this._cursor.setPosition({
+      x: BOARD_WIDTH / 2 - 1,
+      y: BOARD_HEIGHT / 2
+    });
+    game.addGameObject('cursor', this._cursor);
+    this._inputBuffer = {
+      up: false,
+      right: false,
+      down: false,
+      left: false
+    };
   }
 
   private resetBoard() {
@@ -38,7 +56,7 @@ class Board implements IGameObject {
     }
 
     // apply gravity to the random placeholders
-    // note: this is hella lazy,taking multiple passes
+    // note: this is hella lazy, taking multiple passes
     // of the whole board to let the gravity settle out,
     // but fewer LoC and not _really_ a concern for performance
     let dirty = true;
@@ -88,7 +106,41 @@ class Board implements IGameObject {
   }
 
   update(td: number) {
+    // keyboard checks
+    const keyState = this._game.getInputState();
 
+    if (
+      keyState.left &&
+      !this._inputBuffer.left &&
+      this._cursor.x > 0
+    ) {
+      this._cursor.move(Direction.Left);
+    }
+    if (
+      keyState.right &&
+      !this._inputBuffer.right &&
+      this._cursor.x < BOARD_WIDTH - 2
+    ) {
+      this._cursor.move(Direction.Right);
+    }
+    if (
+      keyState.up &&
+      !this._inputBuffer.up &&
+      this._cursor.y > 0
+    ) {
+      this._cursor.move(Direction.Up)
+    }
+    if (
+      keyState.down &&
+      !this._inputBuffer.down &&
+      this._cursor.y < BOARD_HEIGHT -1
+    ) {
+      this._cursor.move(Direction.Down);
+    }
+
+    // duplicate the current keyboard state so we
+    // can act on a change in state later
+    this._inputBuffer = { ...keyState };
   }
 
   draw() {
